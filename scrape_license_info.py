@@ -3,6 +3,7 @@ import pandas as pd
 from bs4 import BeautifulSoup
 import json
 import pprint
+import re
 
 url = 'https://en.wikipedia.org/wiki/Comparison_of_free_and_open-source_software_licenses'
 
@@ -65,4 +66,11 @@ as_json = table.to_json(orient='records')
 json_as_string = str(as_json).replace('\\n', '').replace('\\"', '').replace("'", "\"")
 
 oss_dict = json.loads(json_as_string)
-pprint.pprint(oss_dict)
+
+search = 'gnu'
+
+for license_data in oss_dict:
+    if re.match(search, license_data['License'], re.IGNORECASE):
+        pprint.pprint(license_data)
+
+#pprint.pprint(oss_dict)
