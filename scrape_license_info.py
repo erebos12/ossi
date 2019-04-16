@@ -12,7 +12,7 @@ class HTMLTableParser:
     def parse_url(self, url):
         response = requests.get(url)
         soup = BeautifulSoup(response.text, 'lxml')
-        table = soup.find_all('table')[0] # grap the first tbale
+        table = soup.find_all('table')[0]  # grap the first tbale
         return self.parse_html_table(table)
 
     def parse_html_table(self, table):
@@ -62,10 +62,7 @@ hp = HTMLTableParser()
 table = hp.parse_url(url)  # Grabbing the table from the tuple
 
 as_json = table.to_json(orient='records')
-json_as_string = str(as_json).replace('\\n','')
+json_as_string = str(as_json).replace('\\n', '').replace('\\"', '').replace("'", "\"")
 
-cleaned_json = json.loads(json_as_string)
-pprint.pprint(cleaned_json)
-#print(json.dumps(as_json, indent=4, sort_keys=True))
-
-
+oss_dict = json.loads(json_as_string)
+pprint.pprint(oss_dict)
