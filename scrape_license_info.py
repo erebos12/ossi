@@ -1,6 +1,8 @@
 import requests
 import pandas as pd
 from bs4 import BeautifulSoup
+import json
+import pprint
 
 url = 'https://en.wikipedia.org/wiki/Comparison_of_free_and_open-source_software_licenses'
 
@@ -10,7 +12,7 @@ class HTMLTableParser:
     def parse_url(self, url):
         response = requests.get(url)
         soup = BeautifulSoup(response.text, 'lxml')
-        table = soup.find_all('table')[0]
+        table = soup.find_all('table')[0] # grap the first tbale
         return self.parse_html_table(table)
 
     def parse_html_table(self, table):
@@ -58,4 +60,12 @@ class HTMLTableParser:
 
 hp = HTMLTableParser()
 table = hp.parse_url(url)  # Grabbing the table from the tuple
-print(table)
+
+as_json = table.to_json(orient='records')
+json_as_string = str(as_json).replace('\\n','')
+
+cleaned_json = json.loads(json_as_string)
+pprint.pprint(cleaned_json)
+#print(json.dumps(as_json, indent=4, sort_keys=True))
+
+
