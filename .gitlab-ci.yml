@@ -1,0 +1,62 @@
+variables:
+  DOCKER_REGISTRY: ecregistry.azurecr.io
+  DOCKER_IMAGE_URL: ${DOCKER_REGISTRY}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}
+stages:
+  - build
+  - deploy
+
+before_script:
+ - ENV_VAR_SUFFIX="__${CI_ENVIRONMENT_NAME}"; for var in $(compgen -e | grep "${ENV_VAR_SUFFIX}$"); do declare -x ${var%${ENV_VAR_SUFFIX}}="${!var}"; done 
+  #https://gitlab.com/gitlab-org/gitlab-ce/issues/20367
+
+build container:
+  stage: build
+  image: docker:18.03
+  tags:
+  - fs-acc-europe-west3-gke-1
+  services:
+  - docker:18.03-dind
+  variables:
+    DOCKER_HOST: tcp://localhost:2375
+    DOCKER_DRIVER: overlay2
+    GIT_SUBMODULE_STRATEGY: recursive
+  script:
+  - docker login -u ecregistry -p ${DOCKER_REGISTRY_PASSWORD} https://${DOCKER_REGISTRY}
+  - docker pull ${DOCKER_IMAGE_URL}:${CI_COMMIT_REF_SLUG} || true
+  - docker build --cache-from ${DOCKER_IMAGE_URL}:${CI_COMMIT_REF_SLUG} -t ${DOCKER_IMAGE_URL}:${CI_COMMIT_SHA} .
+  - docker push ${DOCKER_IMAGE_URL}:${CI_COMMIT_SHA}
+  - docker tag ${DOCKER_IMAGE_URL}:${CI_BUILD_REF} ${DOCKER_IMAGE_URL}:${CI_BUILD_REF_SLUG}
+  - docker push ${DOCKER_IMAGE_URL}:${CI_BUILD_REF_SLUG}
+
+deploy production to k8:
+  stage: deploy
+  image: bitlayer/kubernetes-deploy
+  tags:
+  - fs-acc-prd-europe-west3-gke-1	
+  only:
+  - master
+  script:
+  - cd ops && chmod +x ./deploy.sh && ./deploy.sh
+  artifacts:
+    paths:
+    - ops
+  environment:
+    name: production
+    url: http://sbotti.fs-acc.pwc.delivery
+
+
+deploy staging to k8:
+  stage: deploy
+  image: bitlayer/kubernetes-deploy
+  tags:
+  - fs-acc-europe-west3-gke-1	
+  only:
+  - staging
+  script:
+  - cd ops && chmod +x ./deploy.sh && ./deploy.sh
+  artifacts:
+    paths:
+    - ops
+  environment:
+    name: staging
+    url: http://sbotti.stg.fs-acc.pwc.delivery

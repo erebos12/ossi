@@ -1,0 +1,26 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ CI_PROJECT_NAME }}-{{ TRACK|default('stable', true) }}
+  namespace: {{ CI_PROJECT_NAMESPACE }}-{{ CI_ENVIRONMENT_SLUG }}
+spec:
+  replicas: {{ REPLICAS|default(1, true) }}
+  revisionHistoryLimit: 3
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        run: {{ CI_PROJECT_NAME }}
+        track: {{ TRACK|default('stable', true) }}
+    spec:
+      imagePullSecrets:
+        - name: ecregistry
+      containers:
+        - name: {{ CI_PROJECT_NAME }}
+          image: ecregistry.azurecr.io/{{ CI_PROJECT_NAMESPACE }}/{{ CI_PROJECT_NAME }}:{{ DOCKER_IMAGE_TAG }}
+          ports:
+            - containerPort: 5000
