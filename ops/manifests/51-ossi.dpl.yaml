@@ -25,10 +25,3 @@ spec:
               value: "5000"
           ports:
             - containerPort: 5000
-          resources:
-            requests:
-              memory: "500M"
-              cpu: 1
-            limits:
-              memory: "1000M"
-              cpu: 1
