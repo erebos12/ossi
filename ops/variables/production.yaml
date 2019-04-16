@@ -1,2 +1,2 @@
-ingress:
-  server_name:  ossi.fs-acc.pwc.delivery
+nginx:
+  server_name: ossi.fs-acc.pwc.delivery
