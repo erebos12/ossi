@@ -1,2 +1,4 @@
-nginx:
-  server_name: oss-license-checker.stg.fs-acc.pwc.delivery
+ingress:
+  server_name: ossi.stg.fs-acc.pwc.delivery
+
+    

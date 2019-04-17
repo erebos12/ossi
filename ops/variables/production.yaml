@@ -1,2 +1,3 @@
-nginx:
-  server_name: oss-license-checker.fs-acc.pwc.delivery
+ingress:
+  server_name: ossi.fs-acc.pwc.delivery
+
