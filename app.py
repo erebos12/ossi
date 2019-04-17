@@ -15,7 +15,7 @@ oss_dict = json.loads(json_as_string)
 
 @app.route("/")
 def say_hello():
-    return jsonify({"message": "Hi I'm OSSI! The OSS License Checker!"})
+    return jsonify({"message": "Hi I'm OSSI! The [OSS] L[I]cense Checker!"})
 
 
 @app.route('/licenses/<search>')
