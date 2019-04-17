@@ -23,6 +23,7 @@ def search_license_by_string(search):
     for license_data in oss_dict:
         if re.match(search, license_data['License'], re.IGNORECASE):
             return jsonify(license_data)
+    return jsonify({"message": "Nothing found for {}".format(search)})
 
 
 @app.route('/licenses')
