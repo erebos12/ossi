@@ -24,10 +24,8 @@ def say_hello():
 
 @app.route('/licenses/<search>')
 def search_license_by_string(search):
-    for license in licenses:
-        if re.match(search, license['License'], re.IGNORECASE):
-            return jsonify(license)
-    return jsonify({"message": "Nothing found for {}".format(search)})
+    result = [license for license in licenses if re.match(search, license['License'], re.IGNORECASE)]
+    return jsonify(result) if result else jsonify({"message": "Nothing found for {}".format(search)})
 
 
 @app.route('/licenses')
