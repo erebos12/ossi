@@ -1,20 +1,20 @@
-import json
+import utils.logit as logit
 import re
 from flask import Flask, jsonify
-from infrastructure.scrape_license_info import HTMLTableParser
+from infrastructure.html_table_parser import convert_html_table, extract_tables_from_html
 
 app = Flask(__name__)
 
-url = 'https://en.wikipedia.org/wiki/Comparison_of_free_and_open-source_software_licenses'
-hp = HTMLTableParser()
-tables = hp.extract_tables_from_html(url)
-if not tables:
-    raise Exception("No tables found in {}".format(url))
 
-table = hp.html_table_to_dataframe(tables[0])  # take the first table
-as_json = table.to_json(orient='records')
-json_as_string = str(as_json).replace('\\n', '').replace('\\"', '').replace("'", "\"")
-licenses = json.loads(json_as_string)
+def scrape_licenses_from_wikipedia():
+    url = 'https://en.wikipedia.org/wiki/Comparison_of_free_and_open-source_software_licenses'
+    tables = extract_tables_from_html(url)
+    if not tables:
+        raise Exception("No tables found in {}".format(url))
+    licenses = convert_html_table(tables[0])
+    msg = f"Loaded {len(licenses)} Licenses from {url}"
+    logit.log_info(msg)
+    return licenses
 
 
 @app.route("/")
@@ -33,3 +33,6 @@ def search_license_by_string(search):
 @app.route('/licenses')
 def get_all_licenses():
     return jsonify(licenses)
+
+
+licenses = scrape_licenses_from_wikipedia()
