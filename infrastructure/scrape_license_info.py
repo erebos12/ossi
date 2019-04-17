@@ -1,17 +1,19 @@
-import requests
 import pandas as pd
-from bs4 import BeautifulSoup
+import requests
+
+from infrastructure.html_table_parser import get_all_tables_from_html
 
 
 class HTMLTableParser:
 
-    def parse_url(self, url):
-        response = requests.get(url)
-        soup = BeautifulSoup(response.text, 'lxml')
-        table = soup.find_all('table')[0]  # grap the first tbale
-        return self.parse_html_table(table)
+    def extract_tables_from_html(self, url):
+        try:
+            response = requests.get(url)
+            return get_all_tables_from_html(response.text)
+        except Exception as e:
+            raise e
 
-    def parse_html_table(self, table):
+    def html_table_to_dataframe(self, table):
         n_columns = 0
         n_rows = 0
         column_names = []
