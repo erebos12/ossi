@@ -10,4 +10,6 @@ EXPOSE 5000
 
 env FLASK_APP app.py
 
+RUN coverage run unittests/TestSuite.py
+
 CMD ["python", "-m", "flask", "run", "--host=0.0.0.0"]

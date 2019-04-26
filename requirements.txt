@@ -4,3 +4,5 @@ flask
 pandas
 lxml
 coloredlogs
+coverage
+flask_restplus
