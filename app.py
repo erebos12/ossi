@@ -1,9 +1,13 @@
 import utils.logit as logit
 import re
 from flask import Flask, jsonify
+from flask_restplus import Api, Resource
 from infrastructure.html_table_parser import convert_html_table, extract_tables_from_html
 
-app = Flask(__name__)
+flask_app = Flask(__name__)
+app = Api(app=flask_app)
+
+name_space = app.namespace('OSSI', description='OSSI APIs')
 
 
 def scrape_licenses_from_wikipedia():
@@ -17,20 +21,23 @@ def scrape_licenses_from_wikipedia():
     return licenses
 
 
-@app.route("/")
-def say_hello():
-    return jsonify({"message": "Hi I'm OSSI! The [OSS] L[I]cense Checker!"})
+@app.route("/licenses/<search>")
+class Conference(Resource):
+    def get(self, search):
+        """
+        Search for a license by a string
+        """
+        result = [license for license in licenses if re.match(search, license['License'], re.IGNORECASE)]
+        return jsonify(result) if result else jsonify({"message": "Nothing found for {}".format(search)})
 
 
-@app.route('/licenses/<search>')
-def search_license_by_string(search):
-    result = [license for license in licenses if re.match(search, license['License'], re.IGNORECASE)]
-    return jsonify(result) if result else jsonify({"message": "Nothing found for {}".format(search)})
-
-
-@app.route('/licenses')
-def get_all_licenses():
-    return jsonify(licenses)
+@app.route("/licenses")
+class Conference(Resource):
+    def get(self):
+        """
+        Get all license info
+        """
+        return jsonify(licenses)
 
 
 licenses = scrape_licenses_from_wikipedia()
