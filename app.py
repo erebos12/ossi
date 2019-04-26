@@ -1,11 +1,16 @@
 import utils.logit as logit
 import re
-from flask import Flask, jsonify
+from flask import Flask, jsonify, Blueprint
 from flask_restplus import Api, Resource
 from infrastructure.html_table_parser import convert_html_table, extract_tables_from_html
 
 flask_app = Flask(__name__)
-app = Api(app=flask_app)
+blueprint = Blueprint('api', __name__, url_prefix='/api')
+app = Api(app=flask_app,
+          version='1.0',
+          title='OSSI',
+          description='OSSI - OSS Licence Checker',
+          doc='/swagger')
 
 name_space = app.namespace('OSSI', description='OSSI APIs')
 
@@ -21,8 +26,17 @@ def scrape_licenses_from_wikipedia():
     return licenses
 
 
+@app.route("/healthz")
+class OssiHello(Resource):
+    def get(self):
+        """
+        Say hello
+        """
+        return jsonify({"message": "Hi I'm OSSI!"})
+
+
 @app.route("/licenses/<search>")
-class Conference(Resource):
+class OssiLicensesSearch(Resource):
     def get(self, search):
         """
         Search for a license by a string
@@ -32,7 +46,7 @@ class Conference(Resource):
 
 
 @app.route("/licenses")
-class Conference(Resource):
+class OssiLicenses(Resource):
     def get(self):
         """
         Get all license info
