@@ -1,5 +1,4 @@
 FROM python:latest
-LABEL maintainer "Alexander Sahm <sahm.alexander@pwc.com>"
 
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt

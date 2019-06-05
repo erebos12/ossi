@@ -5,12 +5,12 @@ from flask_restplus import Api, Resource
 from infrastructure.html_table_parser import convert_html_table, extract_tables_from_html
 
 flask_app = Flask(__name__)
-blueprint = Blueprint('api', __name__, url_prefix='/api')
+blueprint = Blueprint('', __name__, url_prefix='/')
 app = Api(app=flask_app,
           version='1.0',
           title='OSSI',
           description='OSSI - OSS Licence Checker',
-          doc='/swagger')
+          doc='/')
 
 name_space = app.namespace('OSSI', description='OSSI APIs')
 
